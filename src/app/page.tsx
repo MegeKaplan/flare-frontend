@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl";
-import { useLocaleChanger } from "../../hooks/useLocaleChanger";
-import { useThemeChanger } from "../../hooks/useThemeChanger";
+import { useLocaleChanger } from "@/hooks/useLocaleChanger";
+import { useThemeChanger } from "@/hooks/useThemeChanger";
 
 export default function Home() {
   const t = useTranslations('Home');
