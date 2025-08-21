@@ -1,5 +1,10 @@
 {
   "Home": {
-    "welcome": "Welcome to Flare"
+    "welcome": "Welcome to Flare",
+    "clickMe": "Click me",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "english": "English",
+    "turkish": "Turkish"
   }
 }

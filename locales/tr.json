@@ -1,5 +1,10 @@
 {
   "Home": {
-    "welcome": "Flare'e Hoş Geldiniz"
+    "welcome": "Flare'e Hoş Geldiniz",
+    "clickMe": "Tıkla",
+    "darkMode": "Karanlık Mod",
+    "lightMode": "Aydınlık Mod",
+    "english": "İngilizce",
+    "turkish": "Türkçe"
   }
 }
