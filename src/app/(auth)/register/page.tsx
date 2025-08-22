@@ -12,9 +12,11 @@ import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/store/useAuthStore"
 import authService from "@/services/authService"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const RegisterPage = () => {
-  const { data, setData, resetData } = useAuthStore();
+  const { data, setData } = useAuthStore();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,11 +28,11 @@ const RegisterPage = () => {
     try {
       const res = await authService.sendOTP({ email: data.email });
       toast.success(res.data.message || "OTP sent successfully");
-      
+      router.push("/register/otp");
     } catch (err: any) {
-      toast.error(err.response.data.message || "Something went wrong");
+      const message = err?.response?.data?.message || err?.message || "Something went wrong";
+      toast.error(message);
     }
-    resetData();
   };
 
   return (

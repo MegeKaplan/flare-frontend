@@ -5,7 +5,6 @@ interface SendOTPData {
 }
 
 interface RegisterData {
-  username: string;
   email: string;
   password: string;
   otp: string;
