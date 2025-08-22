@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -8,8 +9,22 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthStore } from "@/store/useAuthStore"
 
 const RegisterPage = () => {
+  const { data, setData, resetData } = useAuthStore();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setData({ [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(data);
+    resetData();
+  };
+
   return (
     <div className="w-full flex items-center justify-center p-4">
       <Card className="w-full max-w-xl text-center">
@@ -20,32 +35,41 @@ const RegisterPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-6">
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <div className="grid gap-3">
-              <Label htmlFor="name">Username</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="name"
+                id="username"
+                name="username"
                 type="text"
                 placeholder="Megebase"
                 required
+                value={data.username}
+                onChange={handleChange}
               />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="megebase@gmail.com"
                 required
+                value={data.email}
+                onChange={handleChange}
               />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="••••••••"
                 required
+                value={data.password}
+                onChange={handleChange}
               />
             </div>
             <Button type="submit" className="w-full">
