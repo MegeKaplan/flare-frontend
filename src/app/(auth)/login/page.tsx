@@ -15,7 +15,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const { data, setData } = useAuthStore();
   const router = useRouter();
 
@@ -27,9 +27,10 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await authService.sendOTP({ email: data.email });
-      toast.success(res.data.message || "OTP sent successfully");
-      router.push("/register/otp");
+      const res = await authService.login({ email: data.email, password: data.password });
+      localStorage.setItem("access_token", res.data.data.access_token);
+      toast.success(res.data.message || "Logged in successfully");
+      router.push("/");
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Something went wrong";
       toast.error(message);
@@ -40,25 +41,13 @@ const RegisterPage = () => {
     <div className="w-full flex items-center justify-center p-4">
       <Card className="w-full max-w-xl text-center">
         <CardHeader>
-          <CardTitle className="text-xl lg:text-2xl">Create your account</CardTitle>
+          <CardTitle className="text-xl lg:text-2xl">Welcome Back</CardTitle>
           <CardDescription className="md:text-lg">
-            Enter your details below to register
+            Enter your details below to login
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-            <div className="grid gap-3">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                placeholder="Megebase"
-                required
-                value={data.username}
-                onChange={handleChange}
-              />
-            </div>
             <div className="grid gap-3">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -84,13 +73,13 @@ const RegisterPage = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Register
+              Login
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="underline underline-offset-4">
-              Login
+            Don't have an account?{" "}
+            <Link href="/register" className="underline underline-offset-4">
+              Register
             </Link>
           </div>
         </CardContent>
@@ -99,4 +88,4 @@ const RegisterPage = () => {
   )
 }
 
-export default RegisterPage
+export default LoginPage

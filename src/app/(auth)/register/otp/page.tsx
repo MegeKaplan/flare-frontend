@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 const OTPPage = () => {
   const { data, setData } = useAuthStore();
@@ -30,7 +31,7 @@ const OTPPage = () => {
         password: data.password,
         otp: data.otp
       });
-      localStorage.setItem("access_token", res.data.access_token);
+      localStorage.setItem("access_token", res.data.data.access_token);
       toast.success(res.data.message || "Registered successfully");
       router.push("/");
     } catch (err: any) {
@@ -71,9 +72,9 @@ const OTPPage = () => {
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <a href="/login" className="underline underline-offset-4">
+            <Link href="/login" className="underline underline-offset-4">
               Login
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>
