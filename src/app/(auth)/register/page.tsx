@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/store/useAuthStore"
+import authService from "@/services/authService"
 
 const RegisterPage = () => {
   const { data, setData, resetData } = useAuthStore();
@@ -21,7 +22,12 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(data);
+    try {
+      const res = await authService.sendOTP({ email: data.email });
+      console.log(res.data);
+    } catch (err: any) {
+      console.error(err.response.data);
+    }
     resetData();
   };
 
