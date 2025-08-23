@@ -25,22 +25,45 @@ const OTPPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const registerResponse = await authService.register({
-        email: data.email,
-        password: data.password,
-        otp: data.otp
-      });
 
-      localStorage.setItem("access_token", registerResponse.data.data.access_token);
+    let userId: string = "";
+
+    try {
+      try {
+        const registerResponse = await authService.register({
+          email: data.email,
+          password: data.password,
+          otp: data.otp
+        });
+
+        localStorage.setItem("access_token", registerResponse.data.data.access_token);
+
+        userId = registerResponse.data.data.user.id;
+        toast.success("Megebase account created. Flare account will be created next.");
+      } catch (err: any) {
+        if (err?.response?.status === 409) {
+          const loginResponse = await authService.login({
+            email: data.email,
+            password: data.password
+          });
+
+          localStorage.setItem("access_token", loginResponse.data.data.access_token);
+
+          userId = loginResponse.data.data.user.id;
+
+          toast.info("A Megebase account with this email already exists. Flare account will be created.");
+        } else {
+          throw err;
+        }
+      }
 
       await authService.createFlareAccount({
         username: data.username,
         email: data.email,
         password: data.password
-      }, registerResponse.data.data.user.id);
+      }, userId);
 
-      toast.success(registerResponse.data.message || "Registered successfully");
+      toast.success("Flare account created successfully!");
       router.push("/");
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Something went wrong";
