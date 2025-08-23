@@ -26,13 +26,21 @@ const OTPPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await authService.register({
+      const registerResponse = await authService.register({
         email: data.email,
         password: data.password,
         otp: data.otp
       });
-      localStorage.setItem("access_token", res.data.data.access_token);
-      toast.success(res.data.message || "Registered successfully");
+
+      localStorage.setItem("access_token", registerResponse.data.data.access_token);
+
+      await authService.createFlareAccount({
+        username: data.username,
+        email: data.email,
+        password: data.password
+      }, registerResponse.data.data.user.id);
+
+      toast.success(registerResponse.data.message || "Registered successfully");
       router.push("/");
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Something went wrong";
