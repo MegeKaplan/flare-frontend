@@ -1,13 +1,10 @@
+import BrandLogo from "@/components/BrandLogo";
 import Image from "next/image";
-import Link from "next/link";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="w-full h-screen flex lg:flex-row p-4 flex-col-reverse gap-x-3">
-      <Link href={"/"} className="text-4xl font-bold m-4 absolute hidden lg:flex select-none flex-col">
-        <span>Flare</span>
-        <span className="text-sm font-medium self-start ml-2 text-zinc-400">by Megebase</span>
-      </Link>
+      <BrandLogo className="m-4" />
       <div className="w-full lg:w-2/5 h-full flex lg:items-center justify-center">
         <div className="w-full flex flex-col items-center lg:justify-center my-4">
           {children}
