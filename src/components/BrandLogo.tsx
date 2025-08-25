@@ -13,7 +13,7 @@ const BrandLogo = ({ className = "", byMegebaseText = true }: LogoProps) => {
     >
       <span>Flare</span>
       {byMegebaseText && (
-        <span className="text-sm font-medium ml-2 text-zinc-400">by Megebase</span>
+        <span className="text-sm font-medium ml-2 dark:text-zinc-400 text-zinc-500">by Megebase</span>
       )}
     </Link>
   );
