@@ -9,7 +9,7 @@ const BrandLogo = ({ className = "", byMegebaseText = true }: LogoProps) => {
   return (
     <Link
       href="/"
-      className={`text-4xl font-bold absolute hidden lg:flex select-none flex-col ${className}`}
+      className={`text-4xl font-bold absolute select-none flex-col flex ${className}`}
     >
       <span>Flare</span>
       {byMegebaseText && (

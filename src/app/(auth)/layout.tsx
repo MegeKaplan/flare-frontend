@@ -4,7 +4,7 @@ import Image from "next/image";
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="w-full h-screen flex lg:flex-row p-4 flex-col-reverse gap-x-3">
-      <BrandLogo className="m-4" />
+      <BrandLogo className="m-4 hidden lg:flex" />
       <div className="w-full lg:w-2/5 h-full flex lg:items-center justify-center">
         <div className="w-full flex flex-col items-center lg:justify-center my-4">
           {children}

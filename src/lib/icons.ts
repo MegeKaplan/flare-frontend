@@ -1,4 +1,4 @@
-import { Home, Search, PlusCircle, Compass, User } from "lucide-react";
+import { Home, Search, PlusCircle, Compass, User, Settings, Bell, MessagesSquare } from "lucide-react";
 
 export const Icons = {
   home: Home,
@@ -6,4 +6,7 @@ export const Icons = {
   plusCircle: PlusCircle,
   compass: Compass,
   user: User,
+  settings: Settings,
+  bell: Bell,
+  messages: MessagesSquare,
 };
