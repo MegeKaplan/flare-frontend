@@ -48,6 +48,7 @@ const OTPPage = () => {
           });
 
           localStorage.setItem("access_token", loginResponse.data.data.access_token);
+          localStorage.setItem("userId", loginResponse.data.data.user.id);
 
           userId = loginResponse.data.data.user.id;
 

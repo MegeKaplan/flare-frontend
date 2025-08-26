@@ -29,6 +29,7 @@ const LoginPage = () => {
     try {
       const res = await authService.login({ email: data.email, password: data.password });
       localStorage.setItem("access_token", res.data.data.access_token);
+      localStorage.setItem("userId", res.data.data.user.id);
       toast.success(res.data.message || "Logged in successfully");
       router.push("/");
     } catch (err: any) {

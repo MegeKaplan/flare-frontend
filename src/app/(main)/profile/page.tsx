@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 
 const ProfilePageRedirect = () => {
-  const username = "Username"
+  const username = localStorage.getItem("username") || localStorage.getItem("userId") || "flare"
   redirect(`/profile/${username}`)
 }
 
