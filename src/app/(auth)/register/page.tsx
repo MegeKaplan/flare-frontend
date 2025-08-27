@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useAuthStore } from "@/store/useAuthStore"
+import useAuthStore from "@/store/useAuthStore"
 import authService from "@/services/authService"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"

@@ -13,8 +13,10 @@ interface AuthState {
   resetData: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+const useAuthStore = create<AuthState>((set) => ({
   data: { username: "", email: "", password: "", otp: "" },
   setData: (newData) => set((state) => ({ data: { ...state.data, ...newData } })),
   resetData: () => set({ data: { username: "", email: "", password: "", otp: "" } }),
 }));
+
+export default useAuthStore;

@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import accountService, { Account } from "@/services/accountService"
+import useStatusStore from "@/store/useStatusStore"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -11,8 +12,7 @@ import { toast } from "sonner"
 const ProfilePage = () => {
   const { username } = useParams<{ username: string }>()
   const [account, setAccount] = useState<Account | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { setLoading, setError } = useStatusStore()
   const [isMyProfile, setIsMyProfile] = useState(false)
 
   useEffect(() => {
@@ -25,6 +25,7 @@ const ProfilePage = () => {
         }
       })
       .catch(err => {
+        toast.error("Failed to load user profile")
         setError("Failed to load user profile")
       })
       .finally(() => { setLoading(false) })
@@ -32,15 +33,6 @@ const ProfilePage = () => {
 
   if (isMyProfile) {
     localStorage.setItem("username", account?.username || "")
-  }
-
-  if (loading) {
-    return <div className="w-full flex justify-center p-4">Loading...</div>
-  }
-
-  if (error) {
-    toast.error(error)
-    return <div className="w-full flex justify-center p-4 text-red-700">{error}</div>
   }
 
   return (
@@ -87,7 +79,6 @@ const ProfilePage = () => {
           <span className="dark:text-zinc-400 text-zinc-600">Following</span>
         </div>
       </div>
-      {/* <div className="w-full flex justify-center md:w-11/12 gap-4 md:gap-6 px-3"> */}
       <div className="w-full grid grid-cols-2 md:w-11/12 gap-4 md:gap-6 px-3">
         {
           isMyProfile ? (

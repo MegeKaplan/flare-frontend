@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useAuthStore } from "@/store/useAuthStore"
+import useAuthStore from "@/store/useAuthStore"
 import authService from "@/services/authService"
 import { toast } from "sonner"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
