@@ -5,8 +5,8 @@ export interface Account {
   username: string
   displayName?: string
   bio?: string
-  profileImageUrl?: string
-  bannerImageUrl?: string
+  profileImageId?: string
+  bannerImageId?: string
 }
 
 interface GetAccountByUsernameData {

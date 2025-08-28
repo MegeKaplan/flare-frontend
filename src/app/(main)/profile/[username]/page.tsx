@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import accountService, { Account } from "@/services/accountService"
+import mediaService from "@/services/mediaService"
 import useStatusStore from "@/store/useStatusStore"
 import Image from "next/image"
 import { useParams } from "next/navigation"
@@ -14,9 +15,14 @@ const ProfilePage = () => {
   const [account, setAccount] = useState<Account | null>(null)
   const { setLoading, setError } = useStatusStore()
   const [isMyProfile, setIsMyProfile] = useState(false)
+  const [profileImages, setProfileImages] = useState<Record<string, string>>({
+    profileImageUrl: "/images/default-profile.png",
+    bannerImageUrl: "/images/default-banner.png",
+  })
 
   useEffect(() => {
     if (!username) return
+    setLoading(true)
     accountService.getAccountByUsername({ username })
       .then(res => {
         setAccount(res.data)
@@ -31,6 +37,25 @@ const ProfilePage = () => {
       .finally(() => { setLoading(false) })
   }, [username])
 
+  useEffect(() => {
+    if (account?.profileImageId) {
+      mediaService.getMediaById(account.profileImageId).then(res => {
+        setProfileImages((prev) => ({ ...prev, profileImageUrl: res.data.url }))
+      }).catch(() => {
+        toast.error("Failed to load profile image")
+      })
+    }
+    if (account?.bannerImageId) {
+      mediaService.getMediaById(account.bannerImageId)
+        .then(res => {
+          setProfileImages((prev) => ({ ...prev, bannerImageUrl: res.data.url }))
+        })
+        .catch(() => {
+          toast.error("Failed to load banner image")
+        })
+    }
+  }, [account])
+
   if (isMyProfile) {
     localStorage.setItem("username", account?.username || "")
   }
@@ -39,11 +64,11 @@ const ProfilePage = () => {
     <div className="w-full p-4 flex flex-col gap-4 items-center">
       <div className="w-full flex flex-col gap-4 justify-center relative max-h-64">
         <div className="size-full overflow-hidden rounded-2xl">
-          <Image src="/images/default-banner.png" alt="Profile Banner" width={1920} height={1080} />
+          <Image src={profileImages.bannerImageUrl} alt="Profile Banner" width={1920} height={1080} />
         </div>
         <div className="absolute bottom-0 left-0 w-full flex justify-center translate-y-1/2">
           <Avatar className="size-32 border-6 dark:border-zinc-950 border-white">
-            <AvatarImage src="/images/default-profile.png" alt="Profile Picture" width={720} height={720} />
+            <AvatarImage src={profileImages.profileImageUrl} alt="Profile Picture" width={720} height={720} />
             <AvatarFallback className="text-4xl">{account?.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </div>
