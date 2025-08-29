@@ -6,6 +6,7 @@ import accountService, { Account } from "@/services/accountService"
 import mediaService from "@/services/mediaService"
 import useStatusStore from "@/store/useStatusStore"
 import Image from "next/image"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -107,7 +108,11 @@ const ProfilePage = () => {
       <div className="w-full grid grid-cols-2 md:w-11/12 gap-4 md:gap-6 px-3">
         {
           isMyProfile ? (
-            <Button variant="outline" className="w-full md:w-auto col-span-2">Edit Profile</Button>
+            <Link href={`/profile/${account?.username}/edit`} className="w-full md:w-auto col-span-2">
+              <Button variant="outline" className="w-full">
+                Edit Profile
+              </Button>
+            </Link>
           ) : (
             <>
               <Button variant="default" className="w-full md:w-auto">Follow</Button>

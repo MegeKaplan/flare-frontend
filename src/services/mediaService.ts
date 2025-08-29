@@ -1,18 +1,14 @@
 import api from "@/lib/axios"
 
-export interface Media {
-  id: string
-  project: string
-  filename: string
-  mimeType: string
-  size: number
-  createdAt: string
-  updatedAt: string
-  signedUrl?: string
-}
+// add Media interface
 
 const mediaService = {
   getMediaById: async (id: string) => api.get<any>(`/megebase/media/${id}`),
+  uploadMedia: async (formData: FormData) => api.post<any>("/megebase/media/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  }),
 }
 
 export default mediaService
