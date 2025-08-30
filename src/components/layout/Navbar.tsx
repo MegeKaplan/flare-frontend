@@ -15,7 +15,7 @@ const Navbar = () => {
     ">
       <Link href="/home" className="p-4"><Icons.home /></Link>
       <Link href="/search" className="p-4"><Icons.search /></Link>
-      <Link href="/new" className="p-4"><Icons.plusCircle /></Link>
+      <Link href="/new/post" className="p-4"><Icons.plusCircle /></Link>
       <Link href="/discover" className="p-4"><Icons.compass /></Link>
       <Link href="/profile" className="p-4"><Icons.user /></Link>
     </div>
