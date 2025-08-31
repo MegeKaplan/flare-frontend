@@ -75,9 +75,9 @@ const PostCard = ({ post }: { post: Post }) => {
         </div>
         {
           post.creator?.id === localStorage.getItem("userId") && (
-            <div className="h-full flex items-center justify-center">
+            <Link href={`${post.id}/edit`} className="h-full flex items-center justify-center">
               <Icons.edit className="size-6 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />
-            </div>
+            </Link>
           )
         }
       </div>
