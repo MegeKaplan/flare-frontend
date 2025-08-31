@@ -2,9 +2,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import accountService, { Account } from "@/services/accountService"
-import mediaService from "@/services/mediaService"
+import { getComposedAccount } from "@/composers/account"
+import { getComposedPost } from "@/composers/content"
+import contentService from "@/services/contentService"
 import useStatusStore from "@/store/useStatusStore"
+import { Account } from "@/types/account"
+import { ComposedPost } from "@/types/content"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -20,42 +24,54 @@ const ProfilePage = () => {
     profileImageUrl: "/images/default-profile.png",
     bannerImageUrl: "/images/default-banner.png",
   })
+  const [posts, setPosts] = useState<ComposedPost[]>([])
 
   useEffect(() => {
-    if (!username) return
-    setLoading(true)
-    accountService.getAccountByUsername({ username })
-      .then(res => {
-        setAccount(res.data)
-        if (localStorage.getItem("userId") === res.data?.id) {
-          setIsMyProfile(true)
+    if (!username) return;
+
+    const fetchAccount = async () => {
+      try {
+        setLoading(true);
+        const composedAccount = await getComposedAccount(username);
+        setAccount(composedAccount);
+        if (localStorage.getItem("userId") === composedAccount.id) {
+          setIsMyProfile(true);
         }
-      })
-      .catch(err => {
-        toast.error("Failed to load user profile")
-        setError("Failed to load user profile")
-      })
-      .finally(() => { setLoading(false) })
-  }, [username])
+        setProfileImages({
+          profileImageUrl: composedAccount.profileImageUrl || profileImages.profileImageUrl,
+          bannerImageUrl: composedAccount.bannerImageUrl || profileImages.bannerImageUrl,
+        });
+      } catch (err) {
+        toast.error("Failed to load user profile");
+        setError("Failed to load user profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccount();
+  }, [username]);
 
   useEffect(() => {
-    if (account?.profileImageId) {
-      mediaService.getMediaById(account.profileImageId).then(res => {
-        setProfileImages((prev) => ({ ...prev, profileImageUrl: res.data.url }))
-      }).catch(() => {
-        toast.error("Failed to load profile image")
-      })
+    if (!account?.id) return
+
+    const fetchPosts = async () => {
+      try {
+        setLoading(true)
+        const { data: rawPosts } = await contentService.getPostsByCreator(account.id)
+        const composedPosts: ComposedPost[] = await Promise.all(
+          rawPosts.map(post => getComposedPost(post.id!))
+        )
+        setPosts(composedPosts)
+      } catch {
+        toast.error("Failed to load posts")
+      } finally {
+        setLoading(false)
+      }
     }
-    if (account?.bannerImageId) {
-      mediaService.getMediaById(account.bannerImageId)
-        .then(res => {
-          setProfileImages((prev) => ({ ...prev, bannerImageUrl: res.data.url }))
-        })
-        .catch(() => {
-          toast.error("Failed to load banner image")
-        })
-    }
-  }, [account])
+
+    fetchPosts()
+  }, [account?.id])
 
   if (isMyProfile) {
     localStorage.setItem("username", account?.username || "")
@@ -93,7 +109,7 @@ const ProfilePage = () => {
       </div>
       <div className="grid grid-cols-3 gap-4 w-full md:w-10/12">
         <div className="w-full rounded-md flex flex-col items-center justify-center">
-          <span className="text-2xl font-semibold">150</span>
+          <span className="text-2xl font-semibold">{posts.length}</span>
           <span className="dark:text-zinc-400 text-zinc-600">Posts</span>
         </div>
         <div className="w-full rounded-md flex flex-col items-center justify-center">
@@ -122,10 +138,45 @@ const ProfilePage = () => {
         }
       </div>
       <Separator />
-      <div>
-        <h2 className="text-center text-muted-foreground">User hasn't posted anything yet</h2>
+      <div className="w-full">
+        {posts.length === 0 ? (
+          <h2 className="text-center text-muted-foreground">User hasn't posted anything yet</h2>
+        ) : (
+          <Tabs defaultValue="image" className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-4">
+              <TabsTrigger value="image" className="p-4 border-b-2 border-b-transparent data-[state=active]:border-b-primary">
+                Image
+              </TabsTrigger>
+              <TabsTrigger value="text" className="p-4 border-b-2 border-b-transparent data-[state=active]:border-b-primary">
+                Text
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="image">
+              <div className="w-full grid grid-cols-3 gap-3">
+                {posts.filter(post => post.mediaUrls && post.mediaUrls.length > 0).map(post => (
+                  <Link href={`/post/${post.id}`} key={post.id} className="border rounded-lg w-full flex items-center justify-center relative aspect-square hover:scale-95 transition">
+                    <Image src={post.mediaUrls![0]} alt={post?.content || ""} className="w-full h-auto rounded-lg object-cover" fill />
+                  </Link>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="text">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                {posts.filter(post => !post.mediaUrls || post.mediaUrls.length === 0).map(post => (
+                  <Link
+                    key={post.id}
+                    href={`/post/${post.id}`}
+                    className="w-full p-4 border rounded-lg shadow hover:shadow-md md:hover:scale-95 transition bg-zinc-100 dark:bg-zinc-900 hover:dark:bg-zinc-800/90 hover:bg-zinc-200"
+                  >
+                    <h3 className="font-semibold lg:text-lg line-clamp-3">{post.content}</h3>
+                  </Link>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
-    </div>
+    </div >
   )
 }
 
