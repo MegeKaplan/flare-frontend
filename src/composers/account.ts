@@ -1,4 +1,5 @@
 import accountService from "@/services/accountService"
+import { graphService } from "@/services/graphService"
 import mediaService from "@/services/mediaService"
 import { ComposedAccount } from "@/types/account"
 
@@ -15,6 +16,10 @@ export const getComposedAccount = async (id: string): Promise<ComposedAccount> =
     const { data } = await mediaService.getMediaById(composed.bannerImageId)
     composed.bannerImageUrl = data.url
   }
+
+  const { data: userGraphData } = await graphService.getUser(composed.id)
+  composed.followers = (userGraphData as any)?.user?.followers?.map((f: any) => f.id) || []
+  composed.following = (userGraphData as any)?.user?.follows?.map((f: any) => f.id) || []
 
   return composed
 }

@@ -8,6 +8,9 @@ const GET_USER = gql`
       followers {
         id
       }
+      follows {
+        id
+      }
     }
   }
 `;

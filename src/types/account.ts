@@ -10,4 +10,6 @@ export interface Account {
 export interface ComposedAccount extends Account {
   profileImageUrl?: string | "/images/default-profile.png"
   bannerImageUrl?: string | "/images/default-banner.png"
+  followers?: string[]
+  following?: string[]
 }

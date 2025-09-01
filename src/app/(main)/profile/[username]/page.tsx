@@ -1,12 +1,14 @@
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import OptimisticToggle from "@/components/ui/OptimisticToggle"
 import { Separator } from "@/components/ui/separator"
 import { getComposedAccount } from "@/composers/account"
 import { getComposedPost } from "@/composers/content"
 import contentService from "@/services/contentService"
+import { graphService } from "@/services/graphService"
 import useStatusStore from "@/store/useStatusStore"
-import { Account } from "@/types/account"
+import { ComposedAccount } from "@/types/account"
 import { ComposedPost } from "@/types/content"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import Image from "next/image"
@@ -17,7 +19,7 @@ import { toast } from "sonner"
 
 const ProfilePage = () => {
   const { username } = useParams<{ username: string }>()
-  const [account, setAccount] = useState<Account | null>(null)
+  const [account, setAccount] = useState<ComposedAccount | null>(null)
   const { setLoading, setError } = useStatusStore()
   const [isMyProfile, setIsMyProfile] = useState(false)
   const [profileImages, setProfileImages] = useState<Record<string, string>>({
@@ -25,6 +27,15 @@ const ProfilePage = () => {
     bannerImageUrl: "/images/default-banner.png",
   })
   const [posts, setPosts] = useState<ComposedPost[]>([])
+  const [myUserId, setMyUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setMyUserId(localStorage.getItem("userId"))
+    if (myUserId === account?.id) {
+      setIsMyProfile(true);
+      localStorage.setItem("username", account?.username || "")
+    }
+  }, [account?.id, myUserId])
 
   useEffect(() => {
     if (!username) return;
@@ -34,9 +45,6 @@ const ProfilePage = () => {
         setLoading(true);
         const composedAccount = await getComposedAccount(username);
         setAccount(composedAccount);
-        if (localStorage.getItem("userId") === composedAccount.id) {
-          setIsMyProfile(true);
-        }
         setProfileImages({
           profileImageUrl: composedAccount.profileImageUrl || profileImages.profileImageUrl,
           bannerImageUrl: composedAccount.bannerImageUrl || profileImages.bannerImageUrl,
@@ -72,10 +80,6 @@ const ProfilePage = () => {
 
     fetchPosts()
   }, [account?.id])
-
-  if (isMyProfile) {
-    localStorage.setItem("username", account?.username || "")
-  }
 
   return (
     <div className="w-full p-4 flex flex-col gap-4 items-center">
@@ -113,11 +117,11 @@ const ProfilePage = () => {
           <span className="dark:text-zinc-400 text-zinc-600">Posts</span>
         </div>
         <div className="w-full rounded-md flex flex-col items-center justify-center">
-          <span className="text-2xl font-semibold">300</span>
+          <span className="text-2xl font-semibold">{account?.followers?.length || 0}</span>
           <span className="dark:text-zinc-400 text-zinc-600">Followers</span>
         </div>
         <div className="w-full rounded-md flex flex-col items-center justify-center">
-          <span className="text-2xl font-semibold">200</span>
+          <span className="text-2xl font-semibold">{account?.following?.length || 0}</span>
           <span className="dark:text-zinc-400 text-zinc-600">Following</span>
         </div>
       </div>
@@ -130,8 +134,25 @@ const ProfilePage = () => {
               </Button>
             </Link>
           ) : (
-            <>
-              <Button variant="default" className="w-full md:w-auto">Follow</Button>
+            account && <>
+              <OptimisticToggle
+                initialState={account?.followers?.includes(myUserId!) || false}
+                action={async () => {
+                  setAccount(prev => prev ? { ...prev, followers: [...prev.followers!, myUserId!] } : prev);
+                  await graphService.followUser(myUserId!, account.id);
+                }}
+                undoAction={async () => {
+                  setAccount(prev => prev ? { ...prev, followers: prev.followers!.filter(f => f !== myUserId!) } : prev);
+                  await graphService.unfollowUser(myUserId!, account.id);
+                }}
+                className="w-full md:w-auto"
+              >
+                {(active, loading) => (
+                  <Button variant={active ? "outline" : "default"} className="w-full" disabled={loading}>
+                    {loading ? "..." : active ? "Following" : "Follow"}
+                  </Button>
+                )}
+              </OptimisticToggle>
               <Button variant="outline" className="w-full md:w-auto">Message</Button>
             </>
           )
