@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect, ChangeEvent, useRef, use } from "react";
 import { useParams, useRouter } from "next/navigation";
-import accountService, { Account } from "@/services/accountService";
+import accountService from "@/services/accountService";
 import mediaService from "@/services/mediaService";
 import useStatusStore from "@/store/useStatusStore";
 import { toast } from "sonner";
@@ -11,12 +11,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
+import { getComposedAccount } from "@/composers/account";
+import { ComposedAccount } from "@/types/account";
 
 const EditProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const router = useRouter();
   const { setLoading, setError } = useStatusStore();
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<ComposedAccount | null>(null);
   const [data, setData] = useState({
     username: username,
     displayName: "",
@@ -33,36 +35,32 @@ const EditProfilePage = () => {
   useEffect(() => {
     if (!username) return;
     setLoading(true);
-    accountService.getAccountByUsername({ username })
-      .then(async res => {
-        setAccount(res.data);
-        setIsMyProfile(localStorage.getItem("userId") === res.data?.id);
 
-        let profileUrl = data.images.profile.url;
-        let bannerUrl = data.images.banner.url;
-
-        if (res.data.profileImageId) {
-          const media = await mediaService.getMediaById(res.data.profileImageId);
-          profileUrl = media.data.url;
-        }
-        if (res.data.bannerImageId) {
-          const media = await mediaService.getMediaById(res.data.bannerImageId);
-          bannerUrl = media.data.url;
-        }
+    const fetchAccount = async () => {
+      try {
+        const composedAccount = await getComposedAccount(username);
+        setAccount(composedAccount);
+        setIsMyProfile(localStorage.getItem("userId") === composedAccount.id);
 
         setData(prev => ({
           ...prev,
-          username: res.data.username,
-          displayName: res.data.displayName || "",
-          bio: res.data.bio || "",
+          username: composedAccount?.username || prev.username,
+          displayName: composedAccount.displayName || "",
+          bio: composedAccount.bio || "",
           images: {
-            profile: { url: profileUrl, file: null },
-            banner: { url: bannerUrl, file: null },
+            profile: { url: composedAccount.profileImageUrl || prev.images.profile.url, file: null },
+            banner: { url: composedAccount.bannerImageUrl || prev.images.banner.url, file: null },
           },
         }));
-      })
-      .catch(() => setError("Failed to load profile"))
-      .finally(() => setLoading(false));
+      } catch {
+        toast.error("Failed to load profile");
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccount();
   }, [username]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>, type: "profile" | "banner") => {
