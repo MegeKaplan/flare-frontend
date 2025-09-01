@@ -1,5 +1,4 @@
 "use client"
-import { Post } from "@/services/contentService"
 import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Icons } from "@/lib/icons"
@@ -7,14 +6,19 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/componen
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { DateTimeFormatOptions, useFormatter, useNow } from "next-intl"
+import { ComposedPost } from "@/types/content"
+import OptimisticToggle from "../ui/OptimisticToggle"
+import { graphService } from "@/services/graphService"
 
-const PostCard = ({ post }: { post: Post }) => {
+const PostCard = ({ post }: { post: ComposedPost }) => {
   const dateFormatter = useFormatter();
   const now = useNow({ updateInterval: 1000 * 30 });
   const [showFullDate, setShowFullDate] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [totalSlides, setTotalSlides] = useState(0);
+  const [likes, setLikes] = useState<string[]>(post.likes || []);
+  const myUserId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -43,19 +47,21 @@ const PostCard = ({ post }: { post: Post }) => {
   const createdAt = post.createdAt ? new Date(post.createdAt) : new Date();
 
   return (
-    <div className="w-full flex flex-col items-center max-w-xl rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow p-4 gap-4 dark:border">
-      <div className="w-full h-16 flex items-center justify-between">
+    <div className="w-full flex flex-col items-center max-w-xl rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow p-4 gap-2 dark:border">
+      <div className="w-full h-12 flex items-center justify-between">
         <div className="flex items-center justify-center gap-3 w-full">
-          <Avatar className="size-14">
-            <AvatarImage
-              src={post.creator?.profileImageUrl}
-              alt="Profile Image"
-              className="size-full"
-            />
-            <AvatarFallback className="text-2xl">{post.creator?.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div className="grid grid-rows-2 w-full">
-            <Link href={`/profile/${post.creator?.username}`} className="h-full font-semibold text-xl flex items-center">
+          <Link href={`/profile/${post.creator?.username}`}>
+            <Avatar className="size-14">
+              <AvatarImage
+                src={post.creator?.profileImageUrl}
+                alt="Profile Image"
+                className="size-full"
+              />
+              <AvatarFallback className="text-2xl">{post.creator?.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="grid grid-rows-2 w-full truncate">
+            <Link href={`/profile/${post.creator?.username}`} className="h-full font-semibold text-xl flex items-center mr-4 truncate">
               {/* {post.creator?.displayName || `@${post.creator?.username}`} */}
               {post.creator?.displayName || `${post.creator?.username}`}
             </Link>
@@ -81,11 +87,16 @@ const PostCard = ({ post }: { post: Post }) => {
           )
         }
       </div>
+      <div className="w-full py-1">
+        <p className="indent-3">
+          {post.content}
+        </p>
+      </div>
       {
-        post.mediaUrls && post.mediaUrls.length > 0 && (
+        post.mediaUrls && post.mediaUrls.length > 1 && (
           <Carousel className="w-full h-auto rounded-lg overflow-hidden" setApi={setCarouselApi}>
             <CarouselContent className="gap-4">
-              {post.mediaUrls.map((url, index) => (
+              {post.mediaUrls.map((url: string, index: number) => (
                 <CarouselItem
                   key={index}
                   className="size-full relative aspect-square bg-zinc-800 rounded-lg overflow-hidden"
@@ -99,7 +110,7 @@ const PostCard = ({ post }: { post: Post }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {totalSlides > 0 && (
+            {totalSlides > 1 && (
               <div className="absolute bottom-2 left-2 bg-zinc-900/30 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md">
                 <span>{currentSlide} / {totalSlides}</span>
               </div>
@@ -108,16 +119,57 @@ const PostCard = ({ post }: { post: Post }) => {
           </Carousel>
         )
       }
-      <div className="w-full">
-        <p className="indent-3">
-          {post.content}
-        </p>
-      </div>
-      <div className="w-full flex items-center justify-between">
-        <div className="w-full flex items-center justify-start gap-4">
-          <Icons.heart className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />
-          <Icons.comment className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />
-          <Icons.save className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />
+      {post.mediaUrls && post.mediaUrls.length === 1 && (
+        <div className="w-full h-auto rounded-lg overflow-hidden relative aspect-square bg-zinc-800">
+          <Image
+            src={post.mediaUrls[0]}
+            alt="Post Media"
+            className="w-full object-cover hover:object-fill select-none"
+            fill
+          />
+        </div>
+      )}
+      <div className="w-full flex items-center justify-between pt-2">
+        <div className="w-full flex items-center justify-start gap-5">
+          <div className="flex items-center w-10">
+            <OptimisticToggle
+              initialState={likes.includes(myUserId)}
+              action={async () => {
+                setLikes(prev => [...prev, myUserId])
+                await graphService.likeContent(myUserId, post.id || "")
+              }}
+              undoAction={async () => {
+                setLikes(prev => prev.filter(id => id !== myUserId))
+                await graphService.unlikeContent(myUserId, post.id || "")
+              }}
+            >
+              {(active, loading) => (
+                <div className={`flex items-center justify-center gap-2 ${active ? "text-red-500" : "dark:text-zinc-400 text-zinc-500 hover:text-zinc-400"}`}>
+                  <Icons.heart
+                    className="size-7 cursor-pointer transition"
+                    fill={active ? "currentColor" : "none"}
+                  />
+                  <span className="text-xl transition">{likes.length}</span>
+                </div>
+              )}
+            </OptimisticToggle>
+          </div>
+          <div className="flex items-center w-10">
+            <div className={`flex items-center justify-center gap-2 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400`}>
+              <Icons.comment
+                className="size-7 cursor-pointer transition"
+              />
+              <span className="text-xl transition">0</span>
+            </div>
+          </div>
+          <div className="flex items-center w-10">
+            <div className={`flex items-center justify-center gap-2 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400`}>
+              <Icons.save
+                className="size-7 cursor-pointer transition"
+              />
+              <span className="text-xl transition">0</span>
+            </div>
+          </div>
         </div>
         <div>
           <Icons.share className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />

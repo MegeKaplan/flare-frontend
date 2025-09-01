@@ -2,6 +2,7 @@ import contentService from "@/services/contentService";
 import { getComposedAccount } from "@/composers/account";
 import mediaService from "@/services/mediaService";
 import { ComposedPost } from "@/types/content";
+import { graphService } from "@/services/graphService";
 
 export const getComposedPost = async (postId: string): Promise<ComposedPost> => {
   const { data: postData } = await contentService.getPost(postId);
@@ -16,6 +17,9 @@ export const getComposedPost = async (postId: string): Promise<ComposedPost> => 
       postData.mediaIds.map(id => mediaService.getMediaById(id).then(res => res.data.url))
     );
   }
+
+  const { data: likesData } = await graphService.getContent(postId)
+  composed.likes = (likesData as any)?.content?.likes.map((user: { id: string }) => user.id) || [];
 
   return composed
 };

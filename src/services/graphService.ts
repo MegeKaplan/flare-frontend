@@ -27,6 +27,29 @@ const UNFOLLOW_USER = gql`
   }
 `;
 
+const GET_CONTENT = gql`
+  query Content($id: ID!) {
+    content(id: $id) {
+      id
+      likes {
+        id
+      }
+    }
+  }
+`;
+
+const LIKE_CONTENT = gql`
+  mutation LikeContent($userId: ID!, $contentId: ID!) {
+    likeContent(userId: $userId, contentId: $contentId)
+  }
+`;
+
+const UNLIKE_CONTENT = gql`
+  mutation UnlikeContent($userId: ID!, $contentId: ID!) {
+    unlikeContent(userId: $userId, contentId: $contentId)
+  }
+`;
+
 export const graphService = {
   getUser: (id: string) =>
     apollo.query({ query: GET_USER, variables: { id } }),
@@ -36,4 +59,13 @@ export const graphService = {
 
   unfollowUser: (followerId: string, followeeId: string) =>
     apollo.mutate({ mutation: UNFOLLOW_USER, variables: { followerId, followeeId } }),
+
+  getContent: (id: string) =>
+    apollo.query({ query: GET_CONTENT, variables: { id } }),
+
+  likeContent: (userId: string, contentId: string) =>
+    apollo.mutate({ mutation: LIKE_CONTENT, variables: { userId, contentId } }),
+
+  unlikeContent: (userId: string, contentId: string) =>
+    apollo.mutate({ mutation: UNLIKE_CONTENT, variables: { userId, contentId } })
 };

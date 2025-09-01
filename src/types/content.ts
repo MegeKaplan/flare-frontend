@@ -12,4 +12,5 @@ export interface Post {
 export interface ComposedPost extends Post {
   creator?: ComposedAccount;
   mediaUrls?: string[];
+  likes?: string[];
 }
