@@ -7,6 +7,9 @@ export const getComposedAccount = async (id: string): Promise<ComposedAccount> =
   const { data: accountData } = await accountService.getAccountById(id)
   const composed: ComposedAccount = { ...accountData }
 
+  composed.profileImageUrl = "/images/default-profile.png"
+  composed.bannerImageUrl = "/images/default-banner.png"
+
   if (composed.profileImageId) {
     const { data } = await mediaService.getMediaById(composed.profileImageId)
     composed.profileImageUrl = data.url
