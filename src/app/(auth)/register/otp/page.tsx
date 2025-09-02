@@ -14,6 +14,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import accountService from "@/services/accountService"
 
 const OTPPage = () => {
   const { data, setData } = useAuthStore();
@@ -58,7 +59,7 @@ const OTPPage = () => {
         }
       }
 
-      await authService.createFlareAccount({
+      await accountService.createFlareAccount({
         username: data.username,
         email: data.email,
         password: data.password
