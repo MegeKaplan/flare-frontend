@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import mediaService from "@/services/mediaService"
 import contentService from "@/services/contentService"
 import { useRouter, useParams } from "next/navigation"
+import AuthGuard from "@/components/AuthGuard"
 
 const EditPostPage = () => {
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
@@ -92,77 +93,79 @@ const EditPostPage = () => {
   }
 
   return (
-    <div className="w-full flex justify-center items-center md:items-start flex-col md:flex-row p-4 md:p-2 gap-8">
-      <Carousel className="aspect-square size-full w-full">
-        <CarouselContent>
-          {existingMedia.map((media, index) => (
-            <CarouselItem key={index} className="flex items-center justify-center aspect-square relative">
-              <Image
-                width={720}
-                height={720}
-                src={media.url}
-                alt={`media-${index}`}
-                className="h-full w-full object-cover rounded-lg"
-              />
-              <div>
-                <Button
-                  variant="destructive"
-                  className="size-20 absolute bottom-10 left-1/2 transform -translate-x-1/2 backdrop-blur-2xl hover:size-24 cursor-pointer"
-                  onClick={() => setExistingMedia(prev => prev.filter((_, i) => i !== index))}
-                >
-                  <Icons.trash className="size-8" />
-                </Button>
-              </div>
+    <AuthGuard>
+      <div className="w-full flex justify-center items-center md:items-start flex-col md:flex-row p-4 md:p-2 gap-8">
+        <Carousel className="aspect-square size-full w-full">
+          <CarouselContent>
+            {existingMedia.map((media, index) => (
+              <CarouselItem key={index} className="flex items-center justify-center aspect-square relative">
+                <Image
+                  width={720}
+                  height={720}
+                  src={media.url}
+                  alt={`media-${index}`}
+                  className="h-full w-full object-cover rounded-lg"
+                />
+                <div>
+                  <Button
+                    variant="destructive"
+                    className="size-20 absolute bottom-10 left-1/2 transform -translate-x-1/2 backdrop-blur-2xl hover:size-24 cursor-pointer"
+                    onClick={() => setExistingMedia(prev => prev.filter((_, i) => i !== index))}
+                  >
+                    <Icons.trash className="size-8" />
+                  </Button>
+                </div>
+              </CarouselItem>
+            ))}
+            {mediaFiles.map((file, index) => (
+              <CarouselItem key={index} className="flex items-center justify-center aspect-square relative">
+                <Image
+                  width={720}
+                  height={720}
+                  src={URL.createObjectURL(file)}
+                  alt={`media-${index}`}
+                  className="h-full w-full object-cover rounded-lg"
+                />
+                <div>
+                  <Button variant="destructive" className="size-20 absolute bottom-10 left-1/2 transform -translate-x-1/2 backdrop-blur-2xl hover:size-24 cursor-pointer" onClick={() => {
+                    setMediaFiles((prev) => prev.filter((_, i) => i !== index))
+                  }}>
+                    <Icons.trash className="size-8" />
+                  </Button>
+                </div>
+              </CarouselItem>
+            ))}
+            <CarouselItem className="flex items-center justify-center aspect-square">
+              <label className="size-11/12 cursor-pointer flex items-center justify-center rounded-lg border-2 border-dashed border-zinc-600 text-zinc-600 hover:border-zinc-500 hover:text-zinc-500 transition">
+                <Icons.plus className="size-12" />
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </label>
             </CarouselItem>
-          ))}
-          {mediaFiles.map((file, index) => (
-            <CarouselItem key={index} className="flex items-center justify-center aspect-square relative">
-              <Image
-                width={720}
-                height={720}
-                src={URL.createObjectURL(file)}
-                alt={`media-${index}`}
-                className="h-full w-full object-cover rounded-lg"
-              />
-              <div>
-                <Button variant="destructive" className="size-20 absolute bottom-10 left-1/2 transform -translate-x-1/2 backdrop-blur-2xl hover:size-24 cursor-pointer" onClick={() => {
-                  setMediaFiles((prev) => prev.filter((_, i) => i !== index))
-                }}>
-                  <Icons.trash className="size-8" />
-                </Button>
-              </div>
-            </CarouselItem>
-          ))}
-          <CarouselItem className="flex items-center justify-center aspect-square">
-            <label className="size-11/12 cursor-pointer flex items-center justify-center rounded-lg border-2 border-dashed border-zinc-600 text-zinc-600 hover:border-zinc-500 hover:text-zinc-500 transition">
-              <Icons.plus className="size-12" />
-              <input
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </label>
-          </CarouselItem>
-        </CarouselContent>
-      </Carousel>
-      <form className="w-full flex flex-col gap-4 md:pt-8" onSubmit={handleSubmit}>
-        <div className="grid gap-3 w-full">
-          <Label htmlFor="content" className="font-semibold">Content</Label>
-          <Textarea
-            id="content"
-            name="content"
-            value={data.content}
-            onChange={handleChange}
-            rows={4}
-            className="w-full max-h-64"
-          />
-        </div>
-        <Button type="submit" className="w-full">
-          Update Post
-        </Button>
-      </form>
-    </div>
+          </CarouselContent>
+        </Carousel>
+        <form className="w-full flex flex-col gap-4 md:pt-8" onSubmit={handleSubmit}>
+          <div className="grid gap-3 w-full">
+            <Label htmlFor="content" className="font-semibold">Content</Label>
+            <Textarea
+              id="content"
+              name="content"
+              value={data.content}
+              onChange={handleChange}
+              rows={4}
+              className="w-full max-h-64"
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            Update Post
+          </Button>
+        </form>
+      </div>
+    </AuthGuard>
   )
 }
 

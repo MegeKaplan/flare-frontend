@@ -12,12 +12,13 @@ import { Label } from "@/components/ui/label"
 import useAuthStore from "@/store/useAuthStore"
 import authService from "@/services/authService"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
 const LoginPage = () => {
   const { data, setData } = useAuthStore();
   const router = useRouter();
+  const returnUrl = useSearchParams().get("returnUrl") || "/";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,7 +33,7 @@ const LoginPage = () => {
       localStorage.setItem("access_token", res.data.data.access_token);
       localStorage.setItem("userId", res.data.data.user.id);
       toast.success(res.data.message || "Logged in successfully");
-      router.push("/");
+      router.push(returnUrl);
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Something went wrong";
       toast.error(message);
