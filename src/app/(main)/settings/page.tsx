@@ -4,10 +4,29 @@ import { useLocaleChanger } from "@/hooks/useLocaleChanger"
 import { useThemeChanger } from "@/hooks/useThemeChanger"
 import { Icons } from "@/lib/icons"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import { useEffect } from "react"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const SettingsPage = () => {
   const { theme, changeTheme } = useThemeChanger()
   const { changeLocale } = useLocaleChanger()
+  const router = useRouter()
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      toast.error("You must be logged in to access settings.")
+      router.push("/login")
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.clear()
+    toast.success("Logged out successfully.")
+    router.push("/login")
+  }
 
   return (
     <div className="w-full flex flex-col p-4 gap-4">
@@ -46,6 +65,31 @@ const SettingsPage = () => {
               <option value="en">English</option>
               <option value="tr">Turkish</option>
             </select>
+          </div>
+        </Card>
+      </div>
+      <div className="w-full flex flex-col gap-4">
+        <div className="flex items-center gap-2">
+          <Icons.user />
+          <h2 className="text-xl">Account</h2>
+        </div>
+        <Card className="w-full p-4 bg-zinc-100 dark:bg-zinc-950 flex flex-col gap-4">
+          <div className="w-full flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <span>Edit Profile</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">Update your personal details.</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push(`/profile/${localStorage.getItem("username") || localStorage.getItem("userId")}/edit`)}>
+              Edit Profile
+            </Button>
+          </div>
+          <Separator className="h-px w-full bg-zinc-300 dark:bg-zinc-900" />
+          <div className="w-full flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <span>Logout</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">Sign out from your account.</span>
+            </div>
+            <Button variant="destructive" size="sm" onClick={handleLogout}>Logout</Button>
           </div>
         </Card>
       </div>

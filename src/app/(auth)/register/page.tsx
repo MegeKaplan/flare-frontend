@@ -26,6 +26,7 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.clear();
     try {
       const res = await authService.sendOTP({ email: data.email });
       toast.success(res.data.message || "OTP sent successfully");

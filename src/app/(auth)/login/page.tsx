@@ -26,6 +26,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.clear();
     try {
       const res = await authService.login({ email: data.email, password: data.password });
       localStorage.setItem("access_token", res.data.data.access_token);
