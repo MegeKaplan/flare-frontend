@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import mediaService from "@/services/mediaService"
 import contentService from "@/services/contentService"
 import { useRouter } from "next/navigation"
+import { graphService } from "@/services/graphService"
 
 const NewPostPage = () => {
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
@@ -56,6 +57,10 @@ const NewPostPage = () => {
       }
 
       const createPostRes = await contentService.createPost({ content: data.content, mediaIds: mediaIds || [] })
+
+      const userId = localStorage.getItem("userId");
+
+      createPostRes.data && await graphService.createContent(userId!, createPostRes.data.id!, "post", createPostRes.data.expiresAt || null)
 
       toast.success("Post created successfully!")
       router.push(`/post/${createPostRes.data.id}`)

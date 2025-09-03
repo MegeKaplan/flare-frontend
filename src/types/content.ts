@@ -7,6 +7,7 @@ export interface Post {
   creatorId?: string;
   createdAt?: string;
   updatedAt?: string;
+  expiresAt?: string | null;
 }
 
 export interface ComposedPost extends Post {
