@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
         hostname: process.env.NEXT_PUBLIC_MEDIA_HOST || 'localhost',
       },
     ],
+    unoptimized: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
