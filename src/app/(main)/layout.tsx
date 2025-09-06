@@ -10,7 +10,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="w-full min-h-screen flex justify-center">
-      <BrandLogo className="m-8 hidden md:flex top-0 left-0" />
+      <BrandLogo className="m-8 hidden md:flex top-0 left-0 fixed" />
       <Topbar />
       <GlobalStatus status={{ loading, error }} />
       <div className={`w-full mt-16 md:w-10/12 lg:w-8/12 md:mt-32 ${(loading || error) && "hidden"}`}>
