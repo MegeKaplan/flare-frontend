@@ -27,6 +27,8 @@ const EditPostPage = () => {
   const { postId } = useParams<{ postId: string }>()
   const [existingMedia, setExistingMedia] = useState<{ id: string; url: string }[]>([])
 
+  const MAX_MEDIA_SIZE_MB = 5
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -55,7 +57,21 @@ const EditPostPage = () => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-    setMediaFiles((prev) => [...prev, ...Array.from(files)])
+
+    const newFiles: File[] = []
+
+    Array.from(files).map(file => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not an image. Please upload only image files.`)
+        return
+      } else if (file.size > MAX_MEDIA_SIZE_MB * 1024 * 1024) {
+        toast.error(`${file.name} size over ${MAX_MEDIA_SIZE_MB}MB. Please upload a smaller file.`)
+        return
+      }
+      newFiles.push(file)
+    })
+
+    setMediaFiles((prev) => [...prev, ...newFiles])
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
