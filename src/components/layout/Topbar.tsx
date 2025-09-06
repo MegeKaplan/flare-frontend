@@ -24,13 +24,14 @@ const Topbar = () => {
   return (
     <div className={`
     flex flex-row md:flex-col items-center justify-between md:justify-center 
-    bg-zinc-100 md:dark:bg-zinc-900 dark:bg-zinc-900/20 
+    bg-zinc-100 md:dark:bg-zinc-900 dark:bg-zinc-950/80 backdrop-blur-2xl 
     border-b md:border-t dark:border-b-zinc-900 border-b-zinc-50 md:dark:border-t-zinc-950 border-t-zinc-200 
     fixed top-0 md:top-30 left-1/2 md:left-8 -translate-x-1/2 md:translate-x-0 
     px-1 md:py-2
     rounded-none md:rounded-lg 
     w-full md:w-auto 
-    h-16 md:h-min
+    h-16 md:h-min 
+    z-10
     ${pathname !== "/home" && "md:hidden"}
     `}>
       <div className="static ml-2 md:hidden text-2xl font-bold">

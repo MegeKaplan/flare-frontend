@@ -12,6 +12,7 @@ const Navbar = () => {
     px-6 md:px-2 
     rounded-none md:rounded-lg 
     w-full md:w-auto 
+    z-10
     ">
       <Link href="/home" className="p-4"><Icons.home /></Link>
       <Link href="/search" className="p-4"><Icons.search /></Link>
