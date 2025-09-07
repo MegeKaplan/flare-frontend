@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const SettingsPage = () => {
   const { theme, changeTheme } = useThemeChanger()
@@ -41,15 +42,16 @@ const SettingsPage = () => {
               <span>Theme</span>
               <span className="text-sm text-zinc-500 dark:text-zinc-400">Choose between light, dark or system default theme.</span>
             </div>
-            <select
-              value={theme}
-              onChange={(e) => changeTheme(e.target.value as "light" | "dark" | "system")}
-              className="bg-transparent outline-none"
-            >
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
+            <Select value={theme} onValueChange={(value) => changeTheme(value as "light" | "dark" | "system")}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <Separator className="h-px w-full bg-zinc-300 dark:bg-zinc-900" />
           <div className="w-full flex items-center justify-between gap-2">
@@ -57,14 +59,18 @@ const SettingsPage = () => {
               <span>Language</span>
               <span className="text-sm text-zinc-500 dark:text-zinc-400">Choose your preferred app language.</span>
             </div>
-            <select
+            <Select
               defaultValue={document.cookie.replace(/(?:(?:^|.*;\s*)locale\s*\=\s*([^;]*).*$)|^.*$/, "$1") || "en"}
-              onChange={(e) => changeLocale(e.target.value)}
-              className="bg-transparent outline-none"
+              onValueChange={(value) => changeLocale(value)}
             >
-              <option value="en">English</option>
-              <option value="tr">Turkish</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="tr">Turkish</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </Card>
       </div>
