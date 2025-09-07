@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { getComposedPost } from "@/composers/content"
 import { ComposedPost } from "@/types/content"
+import LoadingAnimation from "@/components/LoadingAnimation"
 
 const PostPage = () => {
   const { postId } = useParams<{ username: string; postId: string }>();
@@ -25,7 +26,7 @@ const PostPage = () => {
 
   return (
     <div className="size-full flex justify-center items-start p-4">
-      {postData ? <PostCard post={postData} /> : <div>Loading...</div>}
+      {postData ? <PostCard post={postData} /> : <div className="size-full flex items-center justify-center"><LoadingAnimation /></div>}
     </div>
   )
 }
