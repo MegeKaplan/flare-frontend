@@ -139,18 +139,20 @@ const ProfilePage = () => {
               <OptimisticToggle
                 initialState={account?.followers?.includes(myUserId!) || false}
                 action={async () => {
+                  if (!myUserId) return toast.error("You must be logged in to follow users.")
                   setAccount(prev => prev ? { ...prev, followers: [...prev.followers!, myUserId!] } : prev);
                   await graphService.followUser(myUserId!, account.id);
                 }}
                 undoAction={async () => {
+                  if (!myUserId) return
                   setAccount(prev => prev ? { ...prev, followers: prev.followers!.filter(f => f !== myUserId!) } : prev);
                   await graphService.unfollowUser(myUserId!, account.id);
                 }}
                 className="w-full md:w-auto"
               >
                 {(active, loading) => (
-                  <Button variant={active ? "outline" : "default"} className="w-full" disabled={loading}>
-                    {loading ? "..." : active ? "Following" : "Follow"}
+                  <Button variant={myUserId && active ? "outline" : "default"} className="w-full" disabled={loading}>
+                    {loading ? "..." : myUserId && active ? "Following" : "Follow"}
                   </Button>
                 )}
               </OptimisticToggle>

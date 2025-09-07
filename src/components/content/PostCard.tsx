@@ -9,6 +9,7 @@ import { DateTimeFormatOptions, useFormatter, useNow } from "next-intl"
 import { ComposedPost } from "@/types/content"
 import OptimisticToggle from "../ui/OptimisticToggle"
 import { graphService } from "@/services/graphService"
+import { toast } from "sonner"
 
 const PostCard = ({ post }: { post: ComposedPost }) => {
   const dateFormatter = useFormatter();
@@ -135,19 +136,21 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
             <OptimisticToggle
               initialState={likes.includes(myUserId)}
               action={async () => {
+                if (!myUserId) return toast.error("You must be logged in to like posts.")
                 setLikes(prev => [...prev, myUserId])
                 await graphService.likeContent(myUserId, post.id || "")
               }}
               undoAction={async () => {
+                if (!myUserId) return
                 setLikes(prev => prev.filter(id => id !== myUserId))
                 await graphService.unlikeContent(myUserId, post.id || "")
               }}
             >
               {(active, loading) => (
-                <div className={`flex items-center justify-center gap-2 ${active ? "text-red-500" : "dark:text-zinc-400 text-zinc-500 hover:text-zinc-400"}`}>
+                <div className={`flex items-center justify-center gap-2 ${myUserId && active ? "text-red-500" : "dark:text-zinc-400 text-zinc-500 hover:text-zinc-400"}`}>
                   <Icons.heart
                     className="size-7 cursor-pointer transition"
-                    fill={active ? "currentColor" : "none"}
+                    fill={myUserId && active ? "currentColor" : "none"}
                   />
                   <span className="text-xl transition">{likes.length}</span>
                 </div>
