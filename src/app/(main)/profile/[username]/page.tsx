@@ -13,7 +13,7 @@ import { ComposedPost } from "@/types/content"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import Image from "next/image"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -28,6 +28,7 @@ const ProfilePage = () => {
   })
   const [posts, setPosts] = useState<ComposedPost[]>([])
   const [myUserId, setMyUserId] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     setMyUserId(localStorage.getItem("userId"))
@@ -153,7 +154,7 @@ const ProfilePage = () => {
                   </Button>
                 )}
               </OptimisticToggle>
-              <Button variant="outline" className="w-full md:w-auto">Message</Button>
+              <Button variant="outline" className="w-full md:w-auto" onClick={() => router.push(`/messages`)}>Message</Button>
             </>
           )
         }
