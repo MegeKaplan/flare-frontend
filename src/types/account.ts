@@ -5,6 +5,7 @@ export interface Account {
   bio?: string
   profileImageId?: string
   bannerImageId?: string
+  createdAt: string
 }
 
 export interface ComposedAccount extends Account {

@@ -1,5 +1,6 @@
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import OptimisticToggle from "@/components/ui/OptimisticToggle"
 import { Separator } from "@/components/ui/separator"
@@ -112,6 +113,10 @@ const ProfilePage = () => {
               {account.bio}
             </p>
           )}
+        <div className="flex flex-row items-center justify-center flex-wrap gap-2">
+          <Badge>Member</Badge>
+          {account?.createdAt && <Badge variant="secondary">Joined {new Date(account.createdAt).toLocaleDateString()}</Badge>}
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-4 w-full md:w-10/12">
         <div className="w-full rounded-md flex flex-col items-center justify-center">
