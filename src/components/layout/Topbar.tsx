@@ -8,18 +8,18 @@ import { JSX } from "react"
 const Topbar = () => {
   const pathname = usePathname();
 
-  const titles: Record<string, JSX.Element | string> = {
-    "default": <BrandLogo className="static md:hidden" byMegebaseText={false} />,
-    "/search": "Search",
-    "/new": "New Post",
-    "/discover": "Discover",
-    "/profile": "Profile",
-    "/messages": "Messages",
-    "/notifications": "Notifications",
-    "/settings": "Settings",
-  }
+  const titleMap: [string, JSX.Element | string][] = [
+    ["/search", "Search"],
+    ["/new/post", "New Post"],
+    ["/discover", "Discover"],
+    ["/profile", "Profile"],
+    ["/messages", "Messages"],
+    ["/notifications", "Notifications"],
+    ["/settings", "Settings"],
+    ["/post", "Post"],
+  ];
 
-  const title = titles[pathname] || titles["default"];
+  const title = titleMap.find(([prefix]) => pathname.startsWith(prefix))?.[1] || <BrandLogo className="static md:hidden" byMegebaseText={false} />;
 
   return (
     <div className={`
