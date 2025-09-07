@@ -4,12 +4,14 @@ import BrandLogo from "@/components/BrandLogo";
 import Topbar from "@/components/layout/Topbar";
 import GlobalStatus from "@/components/GlobalStatus";
 import useStatusStore from "@/store/useStatusStore";
+import DevDialog from "@/components/DevDialog";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { loading, error } = useStatusStore();
 
   return (
     <div className="w-full min-h-screen flex justify-center pb-20">
+      <DevDialog />
       <BrandLogo className="m-8 hidden md:flex top-0 left-0 fixed" />
       <Topbar />
       <GlobalStatus status={{ loading, error }} />
