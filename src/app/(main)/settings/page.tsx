@@ -93,6 +93,31 @@ const SettingsPage = () => {
           </div>
         </Card>
       </div>
+      <div className="w-full flex flex-col gap-4">
+        <div className="flex items-center gap-2">
+          <Icons.info />
+          <h2 className="text-xl">About</h2>
+        </div>
+        <Card className="w-full p-4 bg-zinc-100 dark:bg-zinc-950 flex flex-col gap-4">
+          <div className="w-full flex items-center justify-between gap-2 flex-col sm:flex-row">
+            <div className="flex flex-col">
+              <span>About Flare</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                Open-source project under MIT license, built on Megebase microservices.
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open("https://github.com/MegeKaplan/flare-frontend", "_blank")}
+              className="w-full sm:w-auto"
+            >
+              View on GitHub
+            </Button>
+          </div>
+        </Card>
+      </div>
+
     </div>
   )
 }
