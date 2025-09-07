@@ -47,6 +47,21 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
 
   const createdAt = post.createdAt ? new Date(post.createdAt) : new Date();
 
+  const handleShare = async () => {
+    try {
+      navigator.clipboard
+        .writeText(`${window.location.origin}/post/${post.id}`)
+        .then(() => {
+          toast.info("Post link copied to clipboard!");
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      toast.error("Failed to copy link.");
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center max-w-xl rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow p-4 gap-2 dark:border">
       <div className="w-full h-12 flex items-center justify-between">
@@ -175,7 +190,10 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
           </div>
         </div>
         <div>
-          <Icons.share className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer" />
+          <Icons.share
+            className="size-7 dark:text-zinc-400 text-zinc-500 hover:text-zinc-400 dark:hover:text-zinc-200 transition cursor-pointer"
+            onClick={handleShare}
+          />
         </div>
       </div>
     </div>
