@@ -5,6 +5,7 @@ import OptimisticToggle from "@/components/ui/OptimisticToggle"
 import { Separator } from "@/components/ui/separator"
 import { getComposedAccount } from "@/composers/account"
 import { getComposedPost } from "@/composers/content"
+import { Icons } from "@/lib/icons"
 import contentService from "@/services/contentService"
 import { graphService } from "@/services/graphService"
 import useStatusStore from "@/store/useStatusStore"
@@ -152,7 +153,7 @@ const ProfilePage = () => {
               >
                 {(active, loading) => (
                   <Button variant={myUserId && active ? "outline" : "default"} className="w-full" disabled={loading}>
-                    {loading ? "..." : myUserId && active ? "Following" : "Follow"}
+                    {loading ? <><Icons.loader className="animate-spin" /><span>Please wait</span></> : myUserId && active ? "Following" : "Follow"}
                   </Button>
                 )}
               </OptimisticToggle>
