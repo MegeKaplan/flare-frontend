@@ -25,7 +25,7 @@ const EditPostPage = () => {
   const { setLoading } = useStatusStore()
   const router = useRouter()
   const { postId } = useParams<{ postId: string }>()
-  const [existingMedia, setExistingMedia] = useState<{ id: string; url: string }[]>([])
+  const [existingMedia, setExistingMedia] = useState<{ id: string; urls: { raw: string; processed: string | null } }[]>([])
 
   const MAX_MEDIA_SIZE_MB = 5
 
@@ -40,7 +40,7 @@ const EditPostPage = () => {
           const mediaWithUrls = await Promise.all(
             res.data.mediaIds.map(async id => {
               const mediaRes = await mediaService.getMediaById(id)
-              return { id, url: mediaRes.data.url }
+              return { id, urls: mediaRes.data.urls }
             })
           )
           setExistingMedia(mediaWithUrls)
@@ -118,7 +118,7 @@ const EditPostPage = () => {
                 <Image
                   width={720}
                   height={720}
-                  src={media.url}
+                  src={media.urls.raw}
                   alt={`media-${index}`}
                   className="h-full w-full object-cover rounded-lg"
                 />

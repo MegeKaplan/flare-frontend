@@ -112,13 +112,13 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
         post.mediaUrls && post.mediaUrls.length > 1 && (
           <Carousel className="w-full h-auto rounded-lg overflow-hidden" setApi={setCarouselApi}>
             <CarouselContent className="gap-4">
-              {post.mediaUrls.map((url: string, index: number) => (
+              {post.mediaUrls.map((urls: { raw: string; processed: string | null }, index: number) => (
                 <CarouselItem
                   key={index}
                   className="size-full relative aspect-square bg-zinc-800 rounded-lg overflow-hidden"
                 >
                   <Image
-                    src={url}
+                    src={urls.raw}
                     alt={`Post Media ${index + 1}`}
                     className="w-full object-cover hover:object-fill select-none"
                     fill
@@ -138,7 +138,7 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
       {post.mediaUrls && post.mediaUrls.length === 1 && (
         <div className="w-full h-auto rounded-lg overflow-hidden relative aspect-square bg-zinc-800">
           <Image
-            src={post.mediaUrls[0]}
+            src={post.mediaUrls[0]?.raw}
             alt="Post Media"
             className="w-full object-cover hover:object-fill select-none"
             fill

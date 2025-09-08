@@ -14,7 +14,7 @@ export const getComposedPost = async (postId: string): Promise<ComposedPost> => 
 
   if (postData.mediaIds?.length) {
     composed.mediaUrls = await Promise.all(
-      postData.mediaIds.map(id => mediaService.getMediaById(id).then(res => res.data.url))
+      postData.mediaIds.map(id => mediaService.getMediaById(id).then(res => res.data.urls))
     );
   }
 

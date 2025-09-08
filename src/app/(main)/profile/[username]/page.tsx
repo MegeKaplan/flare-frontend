@@ -185,7 +185,7 @@ const ProfilePage = () => {
               <div className="w-full grid grid-cols-3 gap-3">
                 {posts.filter(post => post.mediaUrls && post.mediaUrls.length > 0).map(post => (
                   <Link href={`/post/${post.id}`} key={post.id} className="border rounded-lg w-full flex items-center justify-center relative aspect-square hover:scale-95 transition">
-                    <Image src={post.mediaUrls![0]} alt={post?.content || ""} className="w-full h-auto rounded-lg object-cover" fill />
+                    <Image src={post.mediaUrls![0].raw} alt={post?.content || ""} className="w-full h-auto rounded-lg object-cover" fill />
                   </Link>
                 ))}
               </div>
