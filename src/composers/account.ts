@@ -12,12 +12,12 @@ export const getComposedAccount = async (id: string): Promise<ComposedAccount> =
 
   if (composed.profileImageId) {
     const { data } = await mediaService.getMediaById(composed.profileImageId)
-    composed.profileImageUrl = data.url
+    composed.profileImageUrl = data.urls.raw
   }
 
   if (composed.bannerImageId) {
     const { data } = await mediaService.getMediaById(composed.bannerImageId)
-    composed.bannerImageUrl = data.url
+    composed.bannerImageUrl = data.urls.raw
   }
 
   const { data: userGraphData } = await graphService.getUser(composed.id)
