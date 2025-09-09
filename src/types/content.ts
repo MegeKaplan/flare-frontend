@@ -13,5 +13,6 @@ export interface Post {
 export interface ComposedPost extends Post {
   creator?: ComposedAccount;
   mediaUrls?: { raw: string; processed: string | null }[];
+  media?: any[]; // change any to media type if available
   likes?: string[];
 }

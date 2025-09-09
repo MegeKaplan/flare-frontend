@@ -25,7 +25,7 @@ const NewPostPage = () => {
   const { setLoading } = useStatusStore()
   const router = useRouter()
 
-  const MAX_MEDIA_SIZE_MB = 5
+  const MAX_MEDIA_SIZE_MB = 30
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -34,8 +34,8 @@ const NewPostPage = () => {
     const newFiles: File[] = []
 
     Array.from(files).map(file => {
-      if (!file.type.startsWith("image/")) {
-        toast.error(`${file.name} is not an image. Please upload only image files.`)
+      if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+        toast.error(`${file.name} is not a supported media type.`)
         return
       } else if (file.size > MAX_MEDIA_SIZE_MB * 1024 * 1024) {
         toast.error(`${file.name} size over ${MAX_MEDIA_SIZE_MB}MB. Please upload a smaller file.`)
@@ -89,17 +89,26 @@ const NewPostPage = () => {
 
   return (
     <div className="w-full flex justify-center items-center md:items-start flex-col md:flex-row p-4 md:p-2 gap-8">
-      <Carousel className="aspect-square size-full w-full">
+      <Carousel className="aspect-square size-full">
         <CarouselContent>
           {mediaFiles.map((file, index) => (
             <CarouselItem key={index} className="flex items-center justify-center aspect-square relative">
-              <Image
-                width={720}
-                height={720}
-                src={URL.createObjectURL(file)}
-                alt={`media-${index}`}
-                className="h-full w-full object-cover rounded-lg"
-              />
+              {file.type.startsWith("image/") ? (
+                <Image
+                  width={720}
+                  height={720}
+                  src={URL.createObjectURL(file)}
+                  alt={`media-${index}`}
+                  className="size-full object-cover rounded-lg"
+                />
+              ) : (
+                <video
+                  src={URL.createObjectURL(file)}
+                  className="size-full object-cover rounded-lg flex items-center justify-center pointer-events-none"
+                  muted
+                  loop
+                />
+              )}
               <div>
                 <Button variant="destructive" className="size-20 absolute bottom-10 left-1/2 transform -translate-x-1/2 backdrop-blur-2xl hover:size-24 cursor-pointer" onClick={() => {
                   setMediaFiles((prev) => prev.filter((_, i) => i !== index))

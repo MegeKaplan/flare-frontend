@@ -13,9 +13,12 @@ export const getComposedPost = async (postId: string): Promise<ComposedPost> => 
   }
 
   if (postData.mediaIds?.length) {
-    composed.mediaUrls = await Promise.all(
-      postData.mediaIds.map(id => mediaService.getMediaById(id).then(res => res.data.urls))
+    const media = await Promise.all(
+      postData.mediaIds.map(id => mediaService.getMediaById(id).then(res => res.data))
     );
+
+    composed.media = media;
+    composed.mediaUrls = media.map(media => media.urls);
   }
 
   const { data: likesData } = await graphService.getContent(postId)

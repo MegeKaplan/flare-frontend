@@ -183,16 +183,33 @@ const ProfilePage = () => {
             </TabsList>
             <TabsContent value="image">
               <div className="w-full grid grid-cols-3 gap-3">
-                {posts.filter(post => post.mediaUrls && post.mediaUrls.length > 0).map(post => (
+                {posts.filter(post => post.media && post.media.length > 0).map(post => (
                   <Link href={`/post/${post.id}`} key={post.id} className="border rounded-lg w-full flex items-center justify-center relative aspect-square hover:scale-95 transition">
-                    <Image src={post.mediaUrls![0].raw} alt={post?.content || ""} className="w-full h-auto rounded-lg object-cover" fill />
+                    {
+                      post.media![0].mimetype.startsWith("video/") ? (
+                        <video
+                          src={post.media![0].urls.raw}
+                          className="size-full rounded-lg object-cover"
+                          muted
+                          playsInline
+                          autoPlay={false}
+                        />
+                      ) : (
+                        <Image
+                          src={post.media![0].urls.raw}
+                          alt={post?.content || ""}
+                          className="size-full rounded-lg object-cover"
+                          fill
+                        />
+                      )
+                    }
                   </Link>
                 ))}
               </div>
             </TabsContent>
             <TabsContent value="text">
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-                {posts.filter(post => !post.mediaUrls || post.mediaUrls.length === 0).map(post => (
+                {posts.filter(post => !post.media || post.media.length === 0).map(post => (
                   <Link
                     key={post.id}
                     href={`/post/${post.id}`}

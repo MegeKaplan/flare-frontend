@@ -4,12 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Icons } from "@/lib/icons"
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { DateTimeFormatOptions, useFormatter, useNow } from "next-intl"
 import { ComposedPost } from "@/types/content"
 import OptimisticToggle from "../ui/OptimisticToggle"
 import { graphService } from "@/services/graphService"
 import { toast } from "sonner"
+import useContentStore from "@/store/useContentStore"
 
 const PostCard = ({ post }: { post: ComposedPost }) => {
   const dateFormatter = useFormatter();
@@ -20,6 +21,50 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
   const [totalSlides, setTotalSlides] = useState(0);
   const [likes, setLikes] = useState<string[]>(post.likes || []);
   const myUserId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const [inView, setInView] = useState<boolean>(false);
+  const { audioMuted, setAudioMuted } = useContentStore();
+
+  useEffect(() => {
+    videoRefs.current.map((video, index) => {
+      if (!video) return;
+      video.muted = audioMuted;
+      if (inView && currentSlide === index + 1) {
+        video.play().catch(() => { });
+      } else {
+        video.pause();
+      }
+    });
+  }, [currentSlide, inView]);
+
+  const muteToggle = () => {
+    const prev = audioMuted;
+    setAudioMuted(!prev);
+  };
+
+  useEffect(() => {
+    videoRefs.current.map((video) => {
+      if (!video) return;
+      video.muted = audioMuted;
+    });
+  }, [audioMuted]);
+
+  useEffect(() => {
+    if (!cardRef.current) return
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0]
+        setInView(entry.isIntersecting)
+      },
+      { threshold: 0.9 }
+    )
+
+    observer.observe(cardRef.current)
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -63,7 +108,7 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center max-w-xl rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow p-4 gap-2 dark:border">
+    <div className="w-full flex flex-col items-center max-w-xl rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow p-4 gap-2 dark:border" ref={cardRef}>
       <div className="w-full h-12 flex items-center justify-between">
         <div className="flex items-center justify-center gap-3 w-full">
           <Link href={`/profile/${post.creator?.username}`}>
@@ -109,20 +154,33 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
         </p>
       </div>
       {
-        post.mediaUrls && post.mediaUrls.length > 1 && (
+        post.media && post.media.length > 0 && (
           <Carousel className="w-full h-auto rounded-lg overflow-hidden" setApi={setCarouselApi}>
             <CarouselContent className="gap-4">
-              {post.mediaUrls.map((urls: { raw: string; processed: string | null }, index: number) => (
+              {post.media!.map((media: { id: string; urls: { raw: string; processed: string | null }, mimetype: string }, index: number) => (
                 <CarouselItem
                   key={index}
                   className="size-full relative aspect-square bg-zinc-800 rounded-lg overflow-hidden"
                 >
-                  <Image
-                    src={urls.raw}
-                    alt={`Post Media ${index + 1}`}
-                    className="w-full object-cover hover:object-fill select-none"
-                    fill
-                  />
+                  {
+                    media.mimetype.startsWith("video/") ? (
+                      <video
+                        src={media.urls.raw}
+                        className="size-full object-cover hover:object-fill select-none"
+                        autoPlay
+                        ref={el => { videoRefs.current[index] = el }}
+                        playsInline
+                        loop
+                      />
+                    ) : (
+                      <Image
+                        src={media.urls.raw}
+                        alt={`Post Media ${index + 1}`}
+                        className="w-full object-cover hover:object-fill select-none"
+                        fill
+                      />
+                    )
+                  }
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -132,19 +190,41 @@ const PostCard = ({ post }: { post: ComposedPost }) => {
               </div>
               // <span className="bg-zinc-900 absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded-t-md">{currentSlide} / {totalSlides}</span>
             )}
+            {
+              post.media!.some(media => media.mimetype.startsWith("video/")) && (
+                <button
+                  onClick={muteToggle}
+                  className="absolute bottom-2 right-2 bg-zinc-900/30 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-sm"
+                >
+                  {audioMuted ? <Icons.volume /> : <Icons.volume2 />}
+                </button>
+              )
+            }
           </Carousel>
         )
       }
-      {post.mediaUrls && post.mediaUrls.length === 1 && (
+      {/* {post.media && post.media.length === 1 && (
         <div className="w-full h-auto rounded-lg overflow-hidden relative aspect-square bg-zinc-800">
-          <Image
-            src={post.mediaUrls[0]?.raw}
-            alt="Post Media"
-            className="w-full object-cover hover:object-fill select-none"
-            fill
-          />
+          {
+            post.media[0]?.mimetype.startsWith("video/") ? (
+              <video
+                src={post.media[0]?.urls.raw}
+                className="size-full object-cover hover:object-fill select-none"
+                autoPlay
+                ref={el => { videoRefs.current[0] = el }}
+                playsInline
+              />
+            ) : (
+              <Image
+                src={post.media[0]?.urls.raw}
+                alt={`Post Media`}
+                className="w-full object-cover hover:object-fill select-none"
+                fill
+              />
+            )
+          }
         </div>
-      )}
+      )} */}
       <div className="w-full flex items-center justify-between pt-2">
         <div className="w-full flex items-center justify-start gap-5">
           <div className="flex items-center w-10">
