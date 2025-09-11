@@ -87,8 +87,8 @@ const ProfilePage = () => {
   return (
     <div className="w-full p-4 flex flex-col gap-4 items-center">
       <div className="w-full flex flex-col gap-4 justify-center relative max-h-64">
-        <div className="size-full overflow-hidden rounded-2xl">
-          <Image src={profileImages.bannerImageUrl} alt="Profile Banner" width={1920} height={1080} />
+        <div className="h-48 md:h-60 lg:h-80 xl:h-96 overflow-hidden rounded-2xl relative">
+          <Image src={profileImages.bannerImageUrl} alt="Profile Banner" fill className="object-cover" />
         </div>
         <div className="absolute bottom-0 left-0 w-full flex justify-center translate-y-1/2">
           <Avatar className="size-32 border-6 dark:border-zinc-950 border-white">

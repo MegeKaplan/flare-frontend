@@ -127,16 +127,10 @@ const EditProfilePage = () => {
     <div className="w-full p-4 flex flex-col gap-4 items-center">
       <div className="w-full flex flex-col gap-4 justify-center relative max-h-64">
         <div
-          className="size-full overflow-hidden rounded-2xl cursor-pointer relative"
+          className="h-48 md:h-60 lg:h-80 xl:h-96 overflow-hidden rounded-2xl relative cursor-pointer"
           onClick={() => bannerInputRef.current?.click()}
         >
-          <Image
-            src={data.images.banner.url}
-            alt="Profile Banner"
-            width={1920}
-            height={1080}
-            className="object-cover pointer-events-none"
-          />
+          <Image src={data.images.banner.url} alt="Profile Banner" fill className="object-cover pointer-events-none" />
         </div>
         <div className="absolute bottom-0 left-0 w-full flex justify-center translate-y-1/2">
           <div
