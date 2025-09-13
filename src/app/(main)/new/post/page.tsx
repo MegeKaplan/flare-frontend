@@ -14,16 +14,23 @@ import useStatusStore from "@/store/useStatusStore"
 import { toast } from "sonner"
 import mediaService from "@/services/mediaService"
 import contentService from "@/services/contentService"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { graphService } from "@/services/graphService"
+import { ContentType, Post } from "@/types/content"
 
 const NewPostPage = () => {
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
-  const [data, setData] = useState({
+  const [data, setData] = useState<Post>({
     content: "",
+    type: ContentType.POST
   })
   const { setLoading } = useStatusStore()
   const router = useRouter()
+  const type = useSearchParams().get("type") as ContentType || ContentType.POST
+
+  if (type && type !== ContentType.POST && type !== ContentType.STORY) {
+    router.push(`/new/post?type=${ContentType.POST}`)
+  }
 
   const MAX_MEDIA_SIZE_MB = 30
 
@@ -72,11 +79,11 @@ const NewPostPage = () => {
         mediaIds = uploadMediaRes.data.map((m: any) => m._id)
       }
 
-      const createPostRes = await contentService.createPost({ content: data.content, mediaIds: mediaIds || [] })
+      const createPostRes = await contentService.createPost({ content: data.content, type: type, mediaIds: mediaIds || [] })
 
       const userId = localStorage.getItem("userId");
 
-      createPostRes.data && await graphService.createContent(userId!, createPostRes.data.id!, "post", createPostRes.data.expiresAt || null)
+      createPostRes.data && await graphService.createContent(userId!, createPostRes.data.id!, type || ContentType.POST, createPostRes.data.expiresAt || null)
 
       toast.success("Post created successfully!")
       router.push(`/post/${createPostRes.data.id}`)

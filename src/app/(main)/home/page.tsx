@@ -6,6 +6,7 @@ import { getComposedPost } from "@/composers/content"
 import { ComposedPost } from "@/types/content"
 import { toast } from "sonner"
 import LoadingAnimation from "@/components/LoadingAnimation"
+import Storybar from "@/components/Storybar"
 
 const POST_FETCH_LIMIT = 4
 
@@ -20,7 +21,7 @@ const HomePage = () => {
     if (loading || !hasMore) return
     setLoading(true)
     try {
-      const { data: rawPosts } = await contentService.getPosts({ limit: POST_FETCH_LIMIT, offset: offset * POST_FETCH_LIMIT })
+      const { data: rawPosts } = await contentService.getPosts({ limit: POST_FETCH_LIMIT, offset: offset * POST_FETCH_LIMIT, type: "post" })
 
       if (rawPosts.length < POST_FETCH_LIMIT) setHasMore(false)
 
@@ -61,6 +62,7 @@ const HomePage = () => {
 
   return (
     <div className="w-full flex flex-col items-center gap-4 lg:gap-8 p-4">
+      <Storybar userId={localStorage.getItem("userId")!} />
       {posts.map(post => <PostCard key={post.id} post={post} />)}
       <div ref={observerRef} className="h-4" />
       {loading && <LoadingAnimation />}
