@@ -10,6 +10,7 @@ const Topbar = () => {
 
   const titleMap: [string, JSX.Element | string][] = [
     ["/search", "Search"],
+    ["/new", "New Content"],
     ["/new/post", "New Post"],
     ["/discover", "Discover"],
     ["/profile", "Profile"],
