@@ -174,11 +174,11 @@ const ProfilePage = () => {
         ) : (
           <Tabs defaultValue="image" className="w-full">
             <TabsList className="w-full grid grid-cols-2 mb-4 px-2">
-              <TabsTrigger value="image" className="border-b-2 border-b-transparent data-[state=active]:bg-zinc-900 m-4 flex items-center justify-center gap-2 p-3 rounded-md hover:bg-zinc-900/80 transition cursor-pointer">
+              <TabsTrigger value="image" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
                 <Icons.image />
                 <span className="font-semibold">Image</span>
               </TabsTrigger>
-              <TabsTrigger value="text" className="border-b-2 border-b-transparent data-[state=active]:bg-zinc-900 m-4 flex items-center justify-center gap-2 p-3 rounded-md hover:bg-zinc-900/80 transition cursor-pointer">
+              <TabsTrigger value="text" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
                 <Icons.type />
                 <span className="font-semibold">Text</span>
               </TabsTrigger>
