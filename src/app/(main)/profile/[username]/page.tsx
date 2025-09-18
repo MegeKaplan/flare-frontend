@@ -29,6 +29,7 @@ const ProfilePage = () => {
     bannerImageUrl: "/images/default-banner.png",
   })
   const [posts, setPosts] = useState<ComposedPost[]>([])
+  const [stories, setStories] = useState<ComposedPost[]>([])
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const router = useRouter()
 
@@ -62,6 +63,24 @@ const ProfilePage = () => {
 
     fetchAccount();
   }, [username]);
+
+  useEffect(() => {
+    if (!account?.id) return
+
+    const fetchStories = async () => {
+      try {
+        const { data: rawStories } = await contentService.getStoriesByCreator(account.id)
+        const composedStories: ComposedPost[] = await Promise.all(
+          rawStories.map(post => getComposedPost(post.id!))
+        )
+        setStories(composedStories)
+      } catch {
+        toast.error("Failed to load stories")
+      }
+    }
+
+    fetchStories()
+  }, [account?.id])
 
   useEffect(() => {
     if (!account?.id) return
@@ -169,11 +188,11 @@ const ProfilePage = () => {
       </div>
       <Separator />
       <div className="w-full">
-        {posts.length === 0 ? (
+        {posts.length === 0 && stories.length === 0 ? (
           <h2 className="text-center text-muted-foreground">User hasn't posted anything yet</h2>
         ) : (
           <Tabs defaultValue="image" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 mb-4 px-2">
+            <TabsList className="w-full grid grid-cols-3 mb-4 px-2">
               <TabsTrigger value="image" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
                 <Icons.image />
                 <span className="font-semibold">Image</span>
@@ -181,6 +200,10 @@ const ProfilePage = () => {
               <TabsTrigger value="text" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
                 <Icons.type />
                 <span className="font-semibold">Text</span>
+              </TabsTrigger>
+              <TabsTrigger value="story" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
+                <Icons.aperture />
+                <span className="font-semibold">Story</span>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="image">
@@ -218,6 +241,32 @@ const ProfilePage = () => {
                     className="w-full p-4 border rounded-lg shadow hover:shadow-md md:hover:scale-95 transition bg-zinc-100 dark:bg-zinc-900 hover:dark:bg-zinc-800/90 hover:bg-zinc-200"
                   >
                     <h3 className="font-semibold lg:text-lg line-clamp-3">{post.content}</h3>
+                  </Link>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="story">
+              <div className="w-full grid grid-cols-3 gap-3">
+                {stories.map(story => (
+                  <Link href={`/post/${story.id}`} key={story.id} className="border rounded-lg w-full flex items-center justify-center relative aspect-square hover:scale-95 transition">
+                    {
+                      story.media![0].mimetype.startsWith("video/") ? (
+                        <video
+                          src={story.media![0].urls.raw}
+                          className="size-full rounded-lg object-cover"
+                          muted
+                          playsInline
+                          autoPlay={false}
+                        />
+                      ) : (
+                        <Image
+                          src={story.media![0].urls.raw}
+                          alt={story?.content || ""}
+                          className="size-full rounded-lg object-cover"
+                          fill
+                        />
+                      )
+                    }
                   </Link>
                 ))}
               </div>

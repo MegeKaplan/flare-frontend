@@ -4,6 +4,7 @@ import { Post } from "@/types/content"
 
 const contentService = {
   getPostsByCreator: (id: string) => api.get<Post[]>(`/flare/posts/?creatorId=${id}&type=post`),
+  getStoriesByCreator: (id: string) => api.get<Post[]>(`/flare/posts/?creatorId=${id}&type=story`),
   getPosts: (params: Record<string, any>) => api.get<Post[]>(`/flare/posts/?${buildQueryString(params)}`),
   getPost: (id: string) => api.get<Post>(`/flare/posts/${id}`),
   createPost: (data: Post) => api.post<Post>("/flare/posts/", data),
