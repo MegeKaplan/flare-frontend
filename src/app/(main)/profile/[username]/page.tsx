@@ -191,20 +191,34 @@ const ProfilePage = () => {
         {posts.length === 0 && stories.length === 0 ? (
           <h2 className="text-center text-muted-foreground">User hasn't posted anything yet</h2>
         ) : (
-          <Tabs defaultValue="image" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 mb-4 px-2">
-              <TabsTrigger value="image" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
-                <Icons.image />
-                <span className="font-semibold">Image</span>
-              </TabsTrigger>
-              <TabsTrigger value="text" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
-                <Icons.type />
-                <span className="font-semibold">Text</span>
-              </TabsTrigger>
-              <TabsTrigger value="story" className="border-b-2 border-b-transparent dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 m-4 flex items-center justify-center gap-2 p-3 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer">
-                <Icons.aperture />
-                <span className="font-semibold">Story</span>
-              </TabsTrigger>
+          <Tabs
+            defaultValue={posts.some(post => post.media && post.media.length > 0) ? "image" : posts.some(post => !post.media || post.media.length === 0) ? "text" : "story"}
+            className="w-full">
+            <TabsList className="w-full flex h-16 p-2 gap-2 md:gap-4 mb-4">
+              {
+                posts.some(post => post.media && post.media.length > 0) && (
+                  <TabsTrigger value="image" className="dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 flex items-center justify-center gap-2 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer flex-1">
+                    <Icons.image />
+                    <span className="font-semibold">Image</span>
+                  </TabsTrigger>
+                )
+              }
+              {
+                posts.some(post => !post.media || post.media.length === 0) && (
+                  <TabsTrigger value="text" className="dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 flex items-center justify-center gap-2 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer flex-1">
+                    <Icons.type />
+                    <span className="font-semibold">Text</span>
+                  </TabsTrigger>
+                )
+              }
+              {
+                stories.length > 0 && (
+                  <TabsTrigger value="story" className="dark:data-[state=active]:bg-zinc-900 data-[state=active]:bg-zinc-100 flex items-center justify-center gap-2 rounded-md dark:hover:bg-zinc-900/80 hover:bg-zinc-100/60 transition cursor-pointer flex-1">
+                    <Icons.aperture />
+                    <span className="font-semibold">Story</span>
+                  </TabsTrigger>
+                )
+              }
             </TabsList>
             <TabsContent value="image">
               <div className="w-full grid grid-cols-3 gap-3">
@@ -238,7 +252,7 @@ const ProfilePage = () => {
                   <Link
                     key={post.id}
                     href={`/post/${post.id}`}
-                    className="w-full p-4 border rounded-lg shadow hover:shadow-md md:hover:scale-95 transition bg-zinc-100 dark:bg-zinc-900 hover:dark:bg-zinc-800/90 hover:bg-zinc-200"
+                    className="w-full p-4 border rounded-lg shadow hover:shadow-md hover:scale-95 transition bg-zinc-100 dark:bg-zinc-900 hover:dark:bg-zinc-800/90 hover:bg-zinc-200"
                   >
                     <h3 className="font-semibold lg:text-lg line-clamp-3">{post.content}</h3>
                   </Link>
