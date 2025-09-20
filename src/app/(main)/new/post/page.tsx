@@ -28,11 +28,6 @@ const NewPostPage = () => {
   const router = useRouter()
   const type = useSearchParams().get("type") as ContentType || ContentType.POST
 
-  if (type === ContentType.STORY) { // disable story creation temporarily
-    toast.info("Story creation is temporarily disabled due to technical issues.")
-    router.push("/new")
-  }
-
   if (type && type !== ContentType.POST && type !== ContentType.STORY) {
     router.push(`/new/post?type=${ContentType.POST}`)
   }
